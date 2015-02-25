@@ -18,25 +18,50 @@ module AtJS {
 
 
     export class Annotation {
-        name;
         side:SideEnum = SideEnum.PRE;
         target:ElementTypeEnum[] = [ElementTypeEnum.GLOBAL_VARIABLE];
 
 
-        constructor() {
+        constructor(name?:string) {
+            AtParser.register(this);
+        }
+    }
 
+    class AnnotationError implements Error {
+        constructor (public message?: string, public name:string = "AnnotationError") {
+            AnnotationError.prototype = Error.prototype;
+            var e:Error = new Error(message);
+            e.name = name;
+            return e;
         }
     }
 
     class AtParser {
-        static atPattern = /\/@(.*)\/;/ig; // find for example /@Annotation/ and give Annotation as match
-        static annotations:Annotation[];
-        static preProcessing() {
+        private static atPattern:RegExp = /\/@(.*)\/;/ig; // find for example /@Annotation/ and give Annotation as match
+        private static preProcAnnotations:Annotation[];
+        private static postProcAnnotations:Annotation[];
+        private static docProcAnnotations:Annotation[];
+
+        static preProcessing():void {
 
         }
 
-        static postProcessing() {
+        static postProcessing():void {
 
+        }
+
+        static register<T extends Annotation>(annotation:T):void {
+            switch (annotation.side) {
+                case SideEnum.DOC:
+                    AtParser.docProcAnnotations.push(annotation);
+                    break;
+                case SideEnum.POST:
+                    AtParser.postProcAnnotations.push(annotation);
+                    break;
+                case SideEnum.PRE:
+                    AtParser.preProcAnnotations.push(annotation);
+                    break;
+            }
         }
     }
 

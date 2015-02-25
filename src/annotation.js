@@ -20,13 +20,27 @@ var AtJS;
     var ElementTypeEnum = AtJS.ElementTypeEnum;
 
     var Annotation = (function () {
-        function Annotation() {
+        function Annotation(name) {
             this.side = 0 /* PRE */;
             this.target = [7 /* GLOBAL_VARIABLE */];
+            AtParser.register(this);
         }
         return Annotation;
     })();
     AtJS.Annotation = Annotation;
+
+    var AnnotationError = (function () {
+        function AnnotationError(message, name) {
+            if (typeof name === "undefined") { name = "AnnotationError"; }
+            this.message = message;
+            this.name = name;
+            AnnotationError.prototype = Error.prototype;
+            var e = new Error(message);
+            e.name = name;
+            return e;
+        }
+        return AnnotationError;
+    })();
 
     var AtParser = (function () {
         function AtParser() {
@@ -35,6 +49,20 @@ var AtJS;
         };
 
         AtParser.postProcessing = function () {
+        };
+
+        AtParser.register = function (annotation) {
+            switch (annotation.side) {
+                case 2 /* DOC */:
+                    AtParser.docProcAnnotations.push(annotation);
+                    break;
+                case 1 /* POST */:
+                    AtParser.postProcAnnotations.push(annotation);
+                    break;
+                case 0 /* PRE */:
+                    AtParser.preProcAnnotations.push(annotation);
+                    break;
+            }
         };
         AtParser.atPattern = /\/@(.*)\/;/ig;
         return AtParser;

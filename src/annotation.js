@@ -16,13 +16,14 @@ var AtJS;
         ElementTypeEnum[ElementTypeEnum["CONSTRUCTOR"] = 5] = "CONSTRUCTOR";
         ElementTypeEnum[ElementTypeEnum["LOCAL_VARIABLE"] = 6] = "LOCAL_VARIABLE";
         ElementTypeEnum[ElementTypeEnum["GLOBAL_VARIABLE"] = 7] = "GLOBAL_VARIABLE";
+        ElementTypeEnum[ElementTypeEnum["FUNCTION"] = 8] = "FUNCTION";
     })(AtJS.ElementTypeEnum || (AtJS.ElementTypeEnum = {}));
     var ElementTypeEnum = AtJS.ElementTypeEnum;
 
     var Annotation = (function () {
         function Annotation(name) {
             this.side = 0 /* PRE */;
-            this.target = [7 /* GLOBAL_VARIABLE */];
+            this.target = [8 /* FUNCTION */];
             AtParser.register(this);
         }
         return Annotation;
@@ -30,10 +31,9 @@ var AtJS;
     AtJS.Annotation = Annotation;
 
     var AnnotationError = (function () {
-        function AnnotationError(message, name) {
-            if (typeof name === "undefined") { name = "AnnotationError"; }
+        function AnnotationError(message) {
             this.message = message;
-            this.name = name;
+            this.name = "AnnotationError";
             AnnotationError.prototype = Error.prototype;
             var e = new Error(message);
             e.name = name;
@@ -62,6 +62,8 @@ var AtJS;
                 case 0 /* PRE */:
                     AtParser.preProcAnnotations.push(annotation);
                     break;
+                default:
+                    throw new AnnotationError("Wrong annotation side");
             }
         };
         AtParser.atPattern = /\/@(.*)\/;/ig;

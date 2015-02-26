@@ -9,6 +9,9 @@ var MyAnnotation = (function (_super) {
     __extends(MyAnnotation, _super);
     function MyAnnotation() {
         _super.apply(this, arguments);
+        this.side = 0 /* PRE */;
+        this.target = [8 /* FUNCTION */];
+        this.name = "MyAnnotation";
     }
     return MyAnnotation;
 })(AtJS.Annotation);

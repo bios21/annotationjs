@@ -13,13 +13,19 @@ module AtJS {
         PARAMETER,
         CONSTRUCTOR,
         LOCAL_VARIABLE,
-        GLOBAL_VARIABLE
+        GLOBAL_VARIABLE,
+        FUNCTION
     }
 
 
-    export class Annotation {
+    export interface IAnnotation {
+        side:SideEnum;
+        target:ElementTypeEnum[];
+    }
+
+    export class Annotation implements IAnnotation {
         side:SideEnum = SideEnum.PRE;
-        target:ElementTypeEnum[] = [ElementTypeEnum.GLOBAL_VARIABLE];
+        target:ElementTypeEnum[] = [ElementTypeEnum.FUNCTION];
 
 
         constructor(name?:string) {
@@ -28,7 +34,8 @@ module AtJS {
     }
 
     class AnnotationError implements Error {
-        constructor (public message?: string, public name:string = "AnnotationError") {
+        public name:string = "AnnotationError"
+        constructor (public message?: string) {
             AnnotationError.prototype = Error.prototype;
             var e:Error = new Error(message);
             e.name = name;
@@ -61,6 +68,8 @@ module AtJS {
                 case SideEnum.PRE:
                     AtParser.preProcAnnotations.push(annotation);
                     break;
+                default:
+                    throw new AnnotationError("Wrong annotation side");
             }
         }
     }
